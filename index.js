@@ -63,7 +63,7 @@ if (development) {
     console.log('server started on port 3001');
   });
 } else {
-  app.use(express.static('./build'));
+  app.use(express.static('./dist'));
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, './dist/index.html'));
   });
