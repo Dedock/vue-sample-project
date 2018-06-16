@@ -1,21 +1,19 @@
-# test-task
+#Test Vue App
 
-> A Vue.js project
+Built with:
 
-## Build Setup
+`Vue Vuex Vue-Router`
 
-``` bash
-# install dependencies
-npm install
+REST API:
 
-# serve with hot reload at localhost:8080
-npm run dev
+`node.js express`
 
-# build for production with minification
-npm run build
+To run dev:
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+`npm i`
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+`node app.js` and `npm run dev` in different terminals
+
+To run production: 
+
+`npm run build`
