@@ -8,9 +8,13 @@
       </select>
       <input v-model="searchValue"/>
     </div>
+    <div>
+      <button class="add-new-user" @click="showAddUserModal">add user</button>
+    </div>
     <table class="users-table">
       <thead>
-      <th>Sort by
+      <th>
+        Sort by
       </th>
       <th>name
         <select @change="changeSortOption('name', $event)">
@@ -23,7 +27,8 @@
           <option value="down">
             down
           </option>
-        </select></th>
+        </select>
+      </th>
       <th>location
         <select @change="changeSortOption('location', $event)">
           <option value="none">
@@ -35,7 +40,8 @@
           <option value="down">
             down
           </option>
-        </select></th>
+        </select>
+      </th>
       <th>
         currency
         <select @change="changeSortOption('currency', $event)">
@@ -48,126 +54,149 @@
           <option value="down">
             down
           </option>
-        </select></th>
+        </select>
+      </th>
+      <th>
+        action
+      </th>
       </thead>
       <tbody  v-if="filteredUsers.length">
-      <tr v-for="user in filteredUsers" :key="user.id" @click="showEditUserModal(user)">
+      <tr v-for="user in filteredUsers" :key="user.id">
         <td><router-link :to="{ name: 'User', params: { id: user.id }}">link to user</router-link></td>
         <td>{{user.name}}</td>
         <td>{{user.location}}</td>
         <td>{{user.currency}}</td>
+        <td>
+          <button @click="showEditUserModal(user)">edit</button>
+          <button @click="removeUser(user.id)">delete</button>
+        </td>
       </tr>
       </tbody>
       <tbody v-else>
       <tr>
-        no users
+        <h2>
+          no users
+        </h2>
       </tr>
       </tbody>
     </table>
-    <edit-user-modal v-if="showModal" :user="selectedUser" @edit="editUser" @close="showModal = false"></edit-user-modal>
+    <edit-user-modal v-if="showModal" :user="selectedUser" :addUser="addUser" @add="saveUser" @edit="editUser" @close="showModal = false"></edit-user-modal>
   </div>
 </template>
 
 <script>
-  import editUserModal from './EditUserModal'
+import editUserModal from './EditUserModal'
 
-  import {
-    mapActions,
-    mapGetters
-  } from 'vuex'
+import {
+  mapActions,
+  mapGetters
+} from 'vuex'
 
-  export default {
-    components : {
-      editUserModal
-    },
-    name : 'HelloWorld',
-    data() {
-      return {
-        searchOptions : [],
-        currentSearchOption : '',
-        currentSortField : '',
-        sortOption : '',
-        searchValue : '',
-        showModal : false,
-        selectedUser: {}
+export default {
+  components: {
+    editUserModal
+  },
+  name: 'HelloWorld',
+  data () {
+    return {
+      searchOptions: [],
+      currentSearchOption: '',
+      currentSortField: '',
+      sortOption: '',
+      searchValue: '',
+      showModal: false,
+      selectedUser: {},
+      addUser: false
+    }
+  },
+  comments: {
+    editUserModal
+  },
+  computed: {
+    ...mapGetters(['users']),
+    filteredUsers () {
+      if (!this.users.length || !this.currentSearchOption) {
+        return this.users
       }
-    },
-    comments: {
-      editUserModal
-    },
-    computed : {
-      ...mapGetters(['users']),
-      filteredUsers() {
-        if (!this.users.length || !this.currentSearchOption) {
-          return this.users
-        }
 
-        let filteredUsers = this.users.filter(user => user[this.currentSearchOption].toString().includes(this.searchValue))
+      let filteredUsers = this.users.filter(user => user[this.currentSearchOption].toString().includes(this.searchValue))
 
-        if (this.currentSortField && this.sortOption !== 'none') {
-          filteredUsers.sort(
-            ((a, b) => {
-              a = a[this.currentSortField]
-              b = b[this.currentSortField]
+      if (this.currentSortField && this.sortOption !== 'none') {
+        filteredUsers.sort(
+          (a, b) => {
+            a = a[this.currentSortField]
+            b = b[this.currentSortField]
 
-              if (typeof a === 'number' && typeof b === 'number') {
-                return a - b
-              } else {
-                a = a.toLowerCase()
-                b = b.toLowerCase()
+            if (typeof a === 'number' && typeof b === 'number') {
+              return a - b
+            } else {
+              a = a.toLowerCase()
+              b = b.toLowerCase()
 
-                if (a > b) {
-                  return 1
-                }
-
-                if (a < b) {
-                  return -1
-                }
-
-                return 0
+              if (a > b) {
+                return 1
               }
-            }).bind(this)
-          )
 
-          if (this.sortOption === 'down') {
-            return filteredUsers.reverse()
-          } else {
-            return filteredUsers
+              if (a < b) {
+                return -1
+              }
+
+              return 0
+            }
           }
+        )
+
+        if (this.sortOption === 'down') {
+          return filteredUsers.reverse()
         } else {
           return filteredUsers
         }
-      },
-      currencySum() {
-        if (this.users.length) {
-          return this.users.reduce((sum, user) => sum + user.currency, 0)
-        } else {
-          return 0
-        }
+      } else {
+        return filteredUsers
       }
     },
-    methods : {
-      ...mapActions(['saveUser', 'getUsers']),
-      changeSortOption(name, event) {
-        this.currentSortField = name
-        this.sortOption = event.target.value
-      },
-      showEditUserModal(user) {
-        this.showModal = true
-        this.selectedUser = user
-      },
-      async editUser (user) {
-        user.currency = +user.currency || 0
-        await this.saveUser(user)
-        this.showModal = false
+    currencySum () {
+      if (this.users.length) {
+        return this.users.reduce((sum, user) => sum + user.currency, 0)
+      } else {
+        return 0
       }
-    },
-    async created() {
-      await this.getUsers()
-      this.searchOptions = Object.keys(this.users[0])
-      this.currentSearchOption = this.searchOptions[0]
     }
+  },
+  methods: {
+    ...mapActions(['updateUser', 'getUsers', 'deleteUser', 'createUser']),
+    changeSortOption (name, event) {
+      this.currentSortField = name
+      this.sortOption = event.target.value
+    },
+    showEditUserModal (user) {
+      this.showModal = true
+      this.selectedUser = user
+    },
+    async editUser (user) {
+      user.currency = +user.currency || 0
+      await this.updateUser(user)
+      this.showModal = false
+    },
+    async removeUser (userId) {
+      this.deleteUser(userId)
+    },
+    showAddUserModal () {
+      this.addUser = true
+      this.showEditUserModal()
+    },
+    async saveUser (user) {
+      user.currency = +user.currency || 0
+      await this.createUser(user)
+      this.showModal = false
+    }
+  },
+  async created () {
+    await this.getUsers()
+    this.searchOptions = Object.keys(this.users[0])
+    this.currentSearchOption = this.searchOptions[0]
   }
+}
 </script>
 
 <style scoped lang="scss">
@@ -213,5 +242,14 @@
 
   a {
     color: #42b983;
+  }
+
+  .add-new-user {
+    margin: 20px auto 0;
+    background-color: #42b983;
+    color: white;
+    font-size: 18px;
+    width: 200px;
+    height: 30px;
   }
 </style>

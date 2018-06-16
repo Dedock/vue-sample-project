@@ -1,24 +1,24 @@
 <template>
 <div class="user-wrapper">
   <h1>Single user page</h1>
-  <p v-for="(value, key) of user($route.params.id)">
+  <p v-for="(value, key) of user($route.params.id)" :key="key">
     <b>{{key}}</b> : {{value}}
   </p>
 </div>
 </template>
 
 <script>
-  import {mapGetters} from 'vuex'
+import {mapGetters} from 'vuex'
 
-  export default {
-    name : "user",
-    data() {
-      return {}
-    },
-    computed: {
-      ...mapGetters(['user'])
-    }
+export default {
+  name: 'user',
+  data () {
+    return {}
+  },
+  computed: {
+    ...mapGetters(['user'])
   }
+}
 </script>
 
 <style lang="scss" scoped>

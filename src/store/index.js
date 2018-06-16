@@ -1,4 +1,3 @@
-/* eslint-disable */
 import Vue from 'vue'
 import Vuex from 'vuex'
 import * as types from './mutation-types'
@@ -8,66 +7,54 @@ import axios from 'axios'
 Vue.use(Vuex)
 
 export const state = {
-  users : []
+  users: []
 }
 
 export const getters = {
-  users : state => state.users,
-  user(state){
+  users: state => state.users,
+  user (state) {
     return id => state.users.find(user => user.id === id)
   }
 }
 
 export const actions = {
-  async saveUser({commit, state}, user) {
-    await axios.post(`/api/user/${user.id}`, user)
-    const userIndex = state.users.findIndex(i => i.id === user.id)
+  async updateUser ({commit, state}, user) {
+    await axios.put(`/api/user/${user.id}`, user)
+    const userIndex = state.users.findIndex(item => item.id === user.id)
     commit(types.SAVE_USER, {userIndex, user})
   },
-  async getUsers({commit}) {
+  async createUser ({commit, state}, user) {
+    const response = await axios.post(`/api/user`, user)
+    commit(types.ADD_USER, response.data)
+  },
+  async getUsers ({commit}) {
     try {
       const users = await axios.get('/api/users')
       commit(types.SAT_USERS, users.data)
     } catch (err) {
       console.log(err)
     }
+  },
+  async deleteUser ({commit}, userId) {
+    await axios.delete(`/api/user/${userId}`)
+    const userIndex = state.users.findIndex(item => item.id === userId)
+    commit(types.DELETE_USER, userIndex)
   }
-  /*  setUsers({commit}) {
-   usersRef.once('value')
-   .then(res => {
-   const result = Object.keys(res.val()).map(key => {
-   return res.val()[key]
-   })
-   commit(types.SET_USERS, result)
-   })
-   },
-   removeUser({commit, state}, id) {
-   usersRef.child(id).remove()
-   .then(res => {
-   let newUsers = state.users.slice()
-   newUsers = newUsers.filter(item => {
-   return item.id !== id
-   })
-   commit(types.SET_USERS, newUsers)
-   })
-   },
-   creatUser({commit, state}, user) {
-   usersRef.child(user.id).set(user)
-   .then(res => {
-   const newUsers = state.users.slice()
-   newUsers.push(user)
-   commit(types.SET_USERS, newUsers)
-   })
-   }*/
 }
 
 export const mutations = {
-  [types.SAVE_USER](state, {userIndex, user}) {
+  [types.SAVE_USER] (state, {userIndex, user}) {
     state.users[userIndex] = user
     state.users = [].concat(state.users)
   },
-  [types.SAT_USERS](state, users) {
+  [types.ADD_USER] (state, user) {
+    state.users.push(user)
+  },
+  [types.SAT_USERS] (state, users) {
     state.users = users
+  },
+  [types.DELETE_USER] (state, userIndex) {
+    state.users.splice(userIndex, 1)
   }
 }
 
@@ -77,4 +64,3 @@ export default new Vuex.Store({
   actions,
   mutations
 })
-/* eslint-enable */

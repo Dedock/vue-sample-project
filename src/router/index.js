@@ -6,20 +6,21 @@ import User from '@/components/User'
 Vue.use(Router)
 
 export default new Router({
-  routes : [
+  mode: 'history',
+  routes: [
     {
-      path : '/',
-      name : 'UsersTable',
-      component : UsersTable
+      path: '/',
+      name: 'UsersTable',
+      component: UsersTable
     },
     {
-      path : '/user/:id',
+      path: '/user/:id',
       name: 'User',
-      component : User
+      component: User
     },
     {
-      path : '*',
-      component : UsersTable
+      path: '*',
+      redirect: '/'
     }
   ]
 })

@@ -23,28 +23,33 @@
 </template>
 
 <script>
-  export default {
-    name : "edit-user-modal",
-    data() {
-      return {
-        userToEdit : {}
-      }
+export default {
+  name: 'edit-user-modal',
+  data () {
+    return {
+      userToEdit: {}
+    }
+  },
+  methods: {
+    close () {
+      this.$emit('close')
     },
-    methods : {
-      close() {
-        this.$emit('close')
-      },
-      editUser() {
+    editUser () {
+      if (this.addUser) {
+        this.$emit('add', this.userToEdit)
+      } else {
         this.$emit('edit', this.userToEdit)
       }
-    },
-    props : {
-      user : Object
-    },
-    mounted() {
-      this.userToEdit = Object.assign({}, this.user)
     }
+  },
+  props: {
+    user: Object,
+    addUser: Boolean
+  },
+  mounted () {
+    this.userToEdit = Object.assign({}, this.user)
   }
+}
 </script>
 
 <style lang="scss" scoped>

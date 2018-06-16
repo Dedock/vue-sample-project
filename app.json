@@ -1,0 +1,10 @@
+{
+  "name": "Test Vue app",
+  "description": "This app does one little thing, and does it well.",
+  "keywords": [
+    "Vue",
+    "NodeJs"
+  ],
+  "repository": "https://github.com/Dedock/vue-sample-project",
+  "image": "heroku/nodejs"
+}
