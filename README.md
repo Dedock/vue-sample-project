@@ -12,7 +12,7 @@ To run dev:
 
 `npm i`
 
-`node app.js` and `npm run dev` in different terminals
+`node index.js` and `npm run dev` in different terminals
 
 To run production: 
 
